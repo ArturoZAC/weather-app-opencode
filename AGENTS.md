@@ -3,7 +3,13 @@
 Weather CLI (Bun + TypeScript). Console app: user enters a city, we fetch weather from Open-Meteo, and ship a standalone executable. See `README.md` for the target menu and behavior.
 
 ## Status
-Early scaffold. `index.ts` is still the `bun init` stub. `src/`, tests, and a build script do not exist yet.
+Working CLI. `index.ts` runs the input loop (reads stdin via Bun's `console` async iterator). `src/` holds the app: `config.ts` (load/save), `api.ts` (Open-Meteo), `menu.ts` (command registry + handlers), `types.ts`, `colors.ts`. Tests and a build script do not exist yet.
+
+## Config storage
+Saved per platform, under a `weather-cli` directory:
+- Windows: `%APPDATA%\weather-cli\config.json`
+- Linux: `$XDG_CONFIG_HOME/weather-cli/config.json` (or `~/.config/weather-cli/config.json`)
+- macOS: `~/Library/Application Support/weather-cli/config.json`
 
 ## Commands
 - Run: `bun index.ts` (Bun executes TypeScript directly — no build step).
