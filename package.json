@@ -5,7 +5,9 @@
   "private": true,
   "scripts": {
     "typecheck": "bun check",
-    "build": "bun build ./index.ts --compile --outfile weather"
+    "build": "bun build --compile ./index.ts --compile --outfile weather",
+    "start": "bun run index.ts",
+    "dev": "bun run index.ts --watch"
   },
   "devDependencies": {
     "@types/bun": "latest"
