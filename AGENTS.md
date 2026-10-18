@@ -30,3 +30,4 @@ https://api.open-meteo.com/v1/forecast?latitude=45.41117&longitude=-75.69812&cur
 
 ## Conventions
 - Code identifiers and commands in English; user-facing CLI text (menu, prompts) in Spanish, matching `README.md`.
+- Every function must be an arrow function (`const fn = () => {}`), never the `function` keyword.

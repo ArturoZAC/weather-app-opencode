@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "typecheck": "bun check"
+    "typecheck": "bun check",
+    "build": "bun build ./index.ts --compile --outfile weather"
   },
   "devDependencies": {
     "@types/bun": "latest"
