@@ -11,7 +11,7 @@ Working CLI. `src/index.ts` runs the input loop (reads stdin via Bun's `console`
 - `api/` — Open-Meteo integration (`geocoding`, `weather`).
 - `utils/` — helpers (`colors`, `constants`, `format`).
 
-Tests do not exist yet.
+Tests live in `tests/`, mirroring the `src/` layout (one `.test.ts` per module).
 
 ## Config storage
 Saved per platform, under a `weather-cli` directory, split into two files:
@@ -27,11 +27,20 @@ A legacy `config.json` is still read as a fallback when the new files are missin
 
 ## Commands
 - Run: `bun src/index.ts` (Bun executes TypeScript directly — no build step).
+- Test: `bun test` (`bun run test:watch` for watch mode, `bun run test:coverage` for coverage). Tests need no network.
 - Typecheck: `bun run typecheck` (= `bun check`). This is Bun's built-in checker, not `tsc`. Do not reach for `tsc`/`npx tsc`.
 - Typecheck one file: `bun check src/index.ts`.
 
+## Tests
+`tests/` mirrors `src/`, one `.test.ts` per module, plus `tests/cli.e2e.test.ts` (spawns `src/index.ts` with piped stdin) and `tests/helpers/`.
+- `tests/setup.ts` is a preload (see `bunfig.toml`): it points `APPDATA`/`XDG_CONFIG_HOME`/`HOME` at a temp dir **before** `src/storage/paths.ts` is imported, wipes that dir before each test, and restores mocks after each test.
+- Never touch the real config from a test: use `../helpers/config.ts` (`citiesFile`, `settingsFile`, `legacyFile`, `seedRaw`, `readSaved`).
+- `fetch` is stubbed via `../helpers/fetch.ts` (`stubFetch`, `stubOpenMeteo`). Do not use `mock.module`: all test files share one process, so it leaks.
+- Output is captured with `../helpers/output.ts`; assert through `stripAnsi` because colors are on when stdout is a TTY.
+- `createAsk()` (the real stdin loop) is covered only by the e2e test; `selectCity` and the actions receive an injected `Ask` (`fakeAsk`).
+
 ## Goal: standalone binary
-The final deliverable is a compiled executable, not just `bun run`:
+The final deliverable is a compiled executable, not just `bun run`. `bun run build` runs `bun test --check` first, so nothing compiles when types or tests fail:
 ```bash
 bun build ./src/index.ts --compile --outfile weather
 ```

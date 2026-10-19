@@ -47,3 +47,17 @@ Esta es la apariencia que deseamos crear
 ════════════════════════════════════════
   Selecciona una opción: 5
 ```
+
+## Testing
+
+Los tests usan el runner integrado de Bun (sin dependencias extra) y viven en `tests/`, espejando la estructura de `src/`.
+
+```bash
+bun test              # corre todos los tests
+bun run test:watch    # modo watch
+bun run test:coverage # reporte de cobertura
+```
+
+- No tocan la red: `fetch` se reemplaza por un stub.
+- No tocan tu configuración real: el preload `tests/setup.ts` redirige `APPDATA`/`XDG_CONFIG_HOME`/`HOME` a un directorio temporal antes de cargar el storage.
+- `bun run build` ejecuta `bun test --check` (tipos + tests) primero: si algo falla, no se genera el binario.

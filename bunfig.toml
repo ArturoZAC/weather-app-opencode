@@ -1,0 +1,3 @@
+[test]
+# Aísla el entorno (APPDATA/XDG_CONFIG_HOME/HOME a un temp) antes de importar cualquier módulo de src/.
+preload = ["./tests/setup.ts"]
