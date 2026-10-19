@@ -1,40 +1,7 @@
-import type { City, DailyForecast, Unit, Weather } from "./types.ts";
-
-const GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search";
-const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
-
-type GeocodeResponse = {
-  results?: Array<{
-    name: string;
-    admin1?: string;
-    country?: string;
-    latitude: number;
-    longitude: number;
-  }>;
-};
-
-export const geocodeCities = async (
-  name: string,
-  count = 5,
-): Promise<City[]> => {
-  const url = new URL(GEOCODE_URL);
-  url.searchParams.set("name", name);
-  url.searchParams.set("count", String(count));
-  url.searchParams.set("language", "es");
-  url.searchParams.set("format", "json");
-
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Geocoding respondió ${response.status}`);
-
-  const data = (await response.json()) as GeocodeResponse;
-  return (data.results ?? []).map((match) => ({
-    name: match.name,
-    admin1: match.admin1,
-    country: match.country ?? "",
-    latitude: match.latitude,
-    longitude: match.longitude,
-  }));
-};
+import type { City } from "../types/City.ts";
+import type { Unit } from "../types/Config.ts";
+import type { DailyForecast, Weather } from "../types/Weather.ts";
+import { FORECAST_URL } from "../utils/constants.ts";
 
 type ForecastResponse = {
   current?: { temperature_2m: number };
