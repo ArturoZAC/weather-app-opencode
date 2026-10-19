@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TARGETS: bun-windows-x64 bun-linux-x64 bun-darwin-x64 bun-darwin-arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
+
+      - name: Gate (tipos + tests)
+        run: bun test --check
+
+      - name: Leer version de package.json
+        run: echo "VERSION=$(jq -r .version package.json)" >> "$GITHUB_ENV"
+
+      - name: Saltar si el release ya existe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "SKIP=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Compilar binarios
+        if: env.SKIP != 'true'
+        run: |
+          for target in $TARGETS; do
+            bun build ./src/index.ts --compile --target="$target" --outfile "dist/weather-$VERSION-${target#bun-}"
+          done
+
+      - name: Publicar release
+        if: env.SKIP != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$VERSION" dist/* \
+            --title "v$VERSION" \
+            --target "$GITHUB_SHA" \
+            --generate-notes
